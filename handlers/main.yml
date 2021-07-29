@@ -1,0 +1,5 @@
+---
+- name: Reload vmagent
+  uri:
+    url: "{{ vmagent_reload_url }}"
+    method: POST

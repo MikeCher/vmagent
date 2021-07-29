@@ -1,0 +1,48 @@
+---
+- name: Ensure storage directory
+  file:
+    state: directory
+    path: "{{ vmagent_storage_dir }}"
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Show prometheus hosts
+  debug:
+    msg: "Prometheus hosts are: {{ groups[prometheus_inventory_group] }}"
+
+- name: Ensure configuration file
+  template:
+    src: prometheus.yml.j2
+    dest: "{{ vmagent_config_dir }}/prometheus.yml"
+    mode: 0755
+    owner: root
+    group: root
+  notify:
+    - Reload vmagent
+  register: vmagent_reconfig
+
+- name: Start docker vmagent container
+  docker_compose:
+    state: present
+    project_name: vmagent
+    restarted: "{{ 'yes' if vmagent_reconfig.changed else 'no' }}"
+    definition:
+      version: '2'
+      services:
+        alertmanager:
+          image: "{{ vmagent_docker_image }}"
+          container_name: "{{ vmagent_container_name }}"
+          command: "{{ vmagent_command }}"
+          ports:
+            - "127.0.0.1:8429:8429"
+          volumes:
+            - "{{ vmagent_storage_dir }}:/vmagentdata"
+            - "{{ vmagent_config_dir }}/prometheus.yml:/etc/prometheus/prometheus.yml"
+          hostname: "{{ vmagent_container_name }}"
+          restart: always
+          labels: "{{ vmagent_docker_labels }}"
+      networks:
+        default:
+          external:
+            name: "{{ vmagent_docker_network_name }}"

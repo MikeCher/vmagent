@@ -1,0 +1,33 @@
+---
+vmagent_docker_network_name: prom_network
+vmagent_container_name: vmagent
+vmagent_docker_image: "victoriametrics/vmagent:v1.63.0"
+vmagent_docker_labels:
+  - vmagent
+vmagent_config_dir: /var/lib/vmagent
+vmagent_storage_dir: "{{ vmagent_config_dir }}/data"
+
+# address and port vminsert or balancer
+vmagent_remotewrite_address: "{{ ansible_host }}"
+vmagent_remotewrite_port: 8480
+vmagent_command:
+  - '--promscrape.config=/etc/prometheus/prometheus.yml'
+  - '--remoteWrite.url=http://{{ vmagent_remotewrite_address }}:{{ vmagent_remotewrite_port }}/insert/0/prometheus/'
+
+vmagent_reload_url: 'http://127.0.0.1:8429/-/reload'
+
+prometheus_config:
+  global:
+    scrape_interval:     5s
+    evaluation_interval: 5s
+
+job_hostname: vmagentserver
+prometheus_client_config:
+  - job_name: "{{ job_hostname }}_nodeexporter"
+    static_configs:
+      - targets: ['{{ ansible_host }}:9100']
+        labels:
+          dns_hostname: "{{ job_hostname }}"
+
+# Inventory group with prometheus targets hosts
+prometheus_inventory_group: ""
