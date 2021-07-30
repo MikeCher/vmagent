@@ -35,7 +35,7 @@
           container_name: "{{ vmagent_container_name }}"
           command: "{{ vmagent_command }}"
           ports:
-            - "127.0.0.1:8429:8429"
+            - "{{ vmagent_address }}8429:8429"
           volumes:
             - "{{ vmagent_storage_dir }}:/vmagentdata"
             - "{{ vmagent_config_dir }}/prometheus.yml:/etc/prometheus/prometheus.yml"
