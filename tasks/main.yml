@@ -7,10 +7,6 @@
     owner: root
     group: root
 
-- name: Show prometheus hosts
-  debug:
-    msg: "Prometheus hosts are: {{ groups[prometheus_inventory_group] }}"
-
 - name: Ensure configuration file
   template:
     src: prometheus.yml.j2
@@ -35,7 +31,7 @@
           container_name: "{{ vmagent_container_name }}"
           command: "{{ vmagent_command }}"
           ports:
-            - "{{ vmagent_address }}8429:8429"
+            - "{{ vmagent_address }}:8429:8429"
           volumes:
             - "{{ vmagent_storage_dir }}:/vmagentdata"
             - "{{ vmagent_config_dir }}/prometheus.yml:/etc/prometheus/prometheus.yml"

@@ -6,7 +6,7 @@ vmagent_docker_labels:
   - vmagent
 vmagent_config_dir: /var/lib/vmagent
 vmagent_storage_dir: "{{ vmagent_config_dir }}/data"
-vmagent_address: "127.0.0.1:"
+vmagent_address: "127.0.0.1"
 
 # address and port vminsert or balancer
 vmagent_remotewrite_address: "{{ ansible_host }}"
@@ -21,14 +21,9 @@ prometheus_config:
   global:
     scrape_interval:     5s
     evaluation_interval: 5s
-
-job_hostname: vmagentserver
-prometheus_client_config:
-  - job_name: "{{ job_hostname }}_nodeexporter"
-    static_configs:
-      - targets: ['{{ ansible_host }}:9100']
-        labels:
-          dns_hostname: "{{ job_hostname }}"
-
-# Inventory group with prometheus targets hosts
-prometheus_inventory_group: ""
+  scrape_configs:
+    - job_name: "{{ job_hostname }}_nodeexporter"
+      static_configs:
+        - targets: ['{{ ansible_host }}:9100']
+          labels:
+            dns_hostname: "{{ ansible_host }}"
