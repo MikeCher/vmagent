@@ -7,6 +7,12 @@
     owner: root
     group: root
 
+- name: Show configuration
+  debug:
+    var: prometheus_config
+  tags:
+    - show_config
+
 - name: Ensure configuration file
   template:
     src: prometheus.yml.j2
@@ -26,7 +32,7 @@
     definition:
       version: '2'
       services:
-        alertmanager:
+        vmagent:
           image: "{{ vmagent_docker_image }}"
           container_name: "{{ vmagent_container_name }}"
           command: "{{ vmagent_command }}"
@@ -38,6 +44,7 @@
           hostname: "{{ vmagent_container_name }}"
           restart: always
           labels: "{{ vmagent_docker_labels }}"
+          extra_hosts: "{{ vmagent_extra_hosts }}"
       networks:
         default:
           external:

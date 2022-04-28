@@ -16,6 +16,7 @@ vmagent_command:
   - '--remoteWrite.url=http://{{ vmagent_remotewrite_address }}:{{ vmagent_remotewrite_port }}/insert/0/prometheus/'
 
 vmagent_reload_url: 'http://127.0.0.1:8429/-/reload'
+vmagent_extra_hosts: []
 
 prometheus_config:
   global:
