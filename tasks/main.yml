@@ -7,6 +7,14 @@
     owner: root
     group: root
 
+- name: Ensure scrape_configs directory
+  file:
+    state: directory
+    path: "{{ vmagent_config_dir }}/scrape_configs"
+    mode: 0755
+    owner: root
+    group: root
+
 - name: Show configuration
   debug:
     var: prometheus_config
@@ -24,11 +32,23 @@
     - Reload vmagent
   register: vmagent_reconfig
 
+- name: Ensure additional configuration files
+  copy:
+    content: "{{ item.data }}"
+    dest: "{{ vmagent_config_dir }}/scrape_configs/{{ item.filename }}"
+    mode: 0755
+    owner: root
+    group: root
+  with_items: "{{ vmagent_additional_configs }}"
+  notify:
+    - Reload vmagent
+  register: vmagent_reconfig_files
+
 - name: Start docker vmagent container
   docker_compose:
     state: present
     project_name: vmagent
-    restarted: "{{ 'yes' if vmagent_reconfig.changed else 'no' }}"
+    restarted: "{{ 'yes' if vmagent_reconfig.changed or vmagent_reconfig_files.changed else 'no' }}"
     definition:
       version: '2'
       services:
@@ -41,6 +61,7 @@
           volumes:
             - "{{ vmagent_storage_dir }}:/vmagentdata"
             - "{{ vmagent_config_dir }}/prometheus.yml:/etc/prometheus/prometheus.yml"
+            - "{{ vmagent_config_dir }}/scrape_configs:/etc/prometheus/scrape_configs"
           hostname: "{{ vmagent_container_name }}"
           restart: always
           labels: "{{ vmagent_docker_labels }}"

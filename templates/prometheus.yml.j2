@@ -1,2 +1,7 @@
 ---
 {{ prometheus_config | to_nice_yaml(indent=2) }}
+
+{% if vmagent_additional_configs != [] %}
+scrape_config_files:
+- scrape_configs/*.yml
+{% endif %}
