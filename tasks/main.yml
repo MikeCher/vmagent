@@ -30,7 +30,6 @@
     group: root
   notify:
     - Reload vmagent
-  register: vmagent_reconfig
 
 - name: Ensure additional configuration files
   copy:
@@ -42,13 +41,11 @@
   with_items: "{{ vmagent_additional_configs }}"
   notify:
     - Reload vmagent
-  register: vmagent_reconfig_files
 
 - name: Start docker vmagent container
   docker_compose:
     state: present
     project_name: vmagent
-    restarted: "{{ 'yes' if vmagent_reconfig.changed or vmagent_reconfig_files.changed else 'no' }}"
     definition:
       version: '2'
       services:
