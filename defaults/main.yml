@@ -1,7 +1,7 @@
 ---
 vmagent_docker_network_name: prom_network
 vmagent_container_name: vmagent
-vmagent_docker_image: "victoriametrics/vmagent:v1.63.0"
+vmagent_docker_image: "victoriametrics/vmagent:v1.65.0"
 vmagent_docker_labels:
   - vmagent
 vmagent_config_dir: /var/lib/vmagent
@@ -20,11 +20,23 @@ vmagent_extra_hosts: []
 
 prometheus_config:
   global:
-    scrape_interval:     5s
-    evaluation_interval: 5s
-  scrape_configs:
-    - job_name: "{{ job_hostname }}_nodeexporter"
-      static_configs:
-        - targets: ['{{ ansible_host }}:9100']
-          labels:
-            dns_hostname: "{{ ansible_host }}"
+    scrape_interval:     10s
+    evaluation_interval: 10s
+#   scrape_configs:
+#     - job_name: "{{ job_hostname }}_nodeexporter"
+#       static_configs:
+#         - targets: ['{{ ansible_host }}:9100']
+#           labels:
+#             dns_hostname: "{{ ansible_host }}"
+
+vmagent_additional_configs: []
+# Example of additional configuration files. They will be placed in file named in
+# 'filename' field value with content of 'data' field. You can add as many
+# scrape configs as needed.
+# - filename: some_vmagent_config.yml
+#   data:
+  # - job_name: "{{ job_hostname }}_nodeexporter"
+  #   static_configs:
+  #     - targets: ['{{ ansible_host }}:9100']
+  #       labels:
+  #         dns_hostname: "{{ ansible_host }}"
