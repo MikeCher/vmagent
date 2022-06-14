@@ -1,7 +1,7 @@
 ---
 vmagent_docker_network_name: prom_network
 vmagent_container_name: vmagent
-vmagent_docker_image: "victoriametrics/vmagent:v1.65.0"
+vmagent_docker_image: "victoriametrics/vmagent:v1.77.2"
 vmagent_docker_labels:
   - vmagent
 vmagent_config_dir: /var/lib/vmagent
@@ -21,7 +21,6 @@ vmagent_extra_hosts: []
 prometheus_config:
   global:
     scrape_interval:     10s
-    evaluation_interval: 10s
 #   scrape_configs:
 #     - job_name: "{{ job_hostname }}_nodeexporter"
 #       static_configs:
