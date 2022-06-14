@@ -31,6 +31,28 @@
   notify:
     - Reload vmagent
 
+- name: Find scrape_configs files
+  find:
+    paths: "{{ vmagent_config_dir }}/scrape_configs"
+    patterns: "*.yml"
+  register: list_of_scrape_files
+
+- name: Select names of scrape_config files
+  set_fact:
+    list_of_scrape_filenames: "{{ list_of_scrape_filenames|default([]) }} + [ '{{ item.path|basename }}' ]"
+  with_items: "{{ list_of_scrape_files.files }}"
+
+- name: Set list of names
+  set_fact:
+    list_of_filenames_to_add: "{{ list_of_filenames_to_add|default([]) }} + [ '{{ item.filename }}' ]"
+  with_items: "{{ vmagent_additional_configs }}"
+
+- name: Clear scrape_configs directory
+  file:
+    path: "{{ vmagent_config_dir }}/scrape_configs/{{ item }}"
+    state: absent
+  with_items: "{{ list_of_scrape_filenames | default([]) | difference(list_of_filenames_to_add) }}"
+
 - name: Ensure additional configuration files
   copy:
     content: "{{ item.data }}"
