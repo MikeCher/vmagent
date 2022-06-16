@@ -42,9 +42,14 @@
     list_of_scrape_filenames: "{{ list_of_scrape_filenames|default([]) }} + [ '{{ item.path|basename }}' ]"
   with_items: "{{ list_of_scrape_files.files }}"
 
+- name: debug
+  debug: 
+    msg: "{{ vars[item][0]['filename'] }}"
+  with_items: "{{ vmagent_additional_configs }}"
+
 - name: Set list of names
   set_fact:
-    list_of_filenames_to_add: "{{ list_of_filenames_to_add|default([]) }} + [ '{{ item.filename }}' ]"
+    list_of_filenames_to_add: "{{ list_of_filenames_to_add|default([]) }} + [ '{{ vars[item].filename }}' ]"
   with_items: "{{ vmagent_additional_configs }}"
 
 - name: Clear scrape_configs directory
@@ -56,7 +61,7 @@
 - name: Ensure additional configuration files
   copy:
     content: "{{ item.data }}"
-    dest: "{{ vmagent_config_dir }}/scrape_configs/{{ item.filename }}"
+    dest: "{{ vmagent_config_dir }}/scrape_configs/{{ vars[item].filename }}"
     mode: 0755
     owner: root
     group: root
